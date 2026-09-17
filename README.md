@@ -10,7 +10,7 @@ Cross-platform: **Android** and **Windows**. The same identity works on both pla
 
 ### Messaging
 - **Text messages**: three-state delivery status — sending → delivered → read.
-- **Image messages**: send and receive photos directly from the chat input — picker integration, automatic compression and thumbnail generation for fast transfer, and tap for full-screen preview with pinch-to-zoom.
+- **Image messages**: send and receive photos directly from the chat input — picker integration, automatic compression and thumbnail generation for fast transfer, tap for full-screen preview with pinch-to-zoom, and a **save-to-gallery** button (Android MediaStore / Windows `Pictures\Wave`).
 - **File transfer**: chunked transfer with live progress.
   - The receiver always gets an **Accept / Reject** dialog with the option to choose a save location — files are never silently written to disk.
   - The sender can **cancel** mid-transfer; a cancelled message is marked failed and never auto-retried.

@@ -8,6 +8,7 @@
 
 #include <flutter_secure_storage_windows/flutter_secure_storage_windows_plugin.h>
 #include <flutter_sound/flutter_sound_plugin_c_api.h>
+#include <gal/gal_plugin_c_api.h>
 #include <ggwave_native/ggwave_native_plugin_c_api.h>
 #include <permission_handler_windows/permission_handler_windows_plugin.h>
 #include <wave_audio/wave_audio_plugin_c_api.h>
@@ -17,6 +18,8 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("FlutterSecureStorageWindowsPlugin"));
   FlutterSoundPluginCApiRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("FlutterSoundPluginCApi"));
+  GalPluginCApiRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("GalPluginCApi"));
   GgwaveNativePluginCApiRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("GgwaveNativePluginCApi"));
   PermissionHandlerWindowsPluginRegisterWithRegistrar(

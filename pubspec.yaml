@@ -31,6 +31,7 @@ dependencies:
   image: ^4.9.2
   enough_mail: ^2.1.7
   flutter_secure_storage: ^11.1.0
+  gal: ^2.3.3
 dev_dependencies:
   flutter_test:
     sdk: flutter

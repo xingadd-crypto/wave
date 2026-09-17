@@ -7,6 +7,7 @@ import 'package:flutter_wave/models/file_transfer.dart';
 import 'package:flutter_wave/providers/app_provider.dart';
 import 'package:flutter_wave/theme/app_theme.dart';
 import 'package:flutter_wave/services/voice_message_io.dart';
+import 'package:flutter_wave/services/gallery_saver.dart';
 import 'package:flutter_wave/widgets/voice_waveform.dart';
 
 class MessageBubble extends ConsumerWidget {
@@ -256,7 +257,7 @@ class MessageBubble extends ConsumerWidget {
     showDialog(
       context: context,
       barrierColor: Colors.black,
-      builder: (_) => Dialog.fullscreen(
+      builder: (dialogContext) => Dialog.fullscreen(
         backgroundColor: Colors.black,
         child: Stack(
           children: [
@@ -277,9 +278,34 @@ class MessageBubble extends ConsumerWidget {
             Positioned(
               top: MediaQuery.of(context).padding.top + 8,
               right: 8,
-              child: IconButton(
-                icon: const Icon(Icons.close, color: Colors.white, size: 28),
-                onPressed: () => Navigator.of(context).pop(),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.save_alt,
+                        color: Colors.white, size: 26),
+                    tooltip: 'Save to gallery',
+                    onPressed: () async {
+                      final where = await GallerySaver.saveImage(path);
+                      if (!dialogContext.mounted) return;
+                      ScaffoldMessenger.of(dialogContext).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            where == null
+                                ? 'Save failed'
+                                : where == 'gallery'
+                                    ? 'Saved to gallery'
+                                    : 'Saved: $where',
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white,
+                        size: 28),
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                  ),
+                ],
               ),
             ),
           ],
