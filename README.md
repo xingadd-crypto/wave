@@ -1,53 +1,94 @@
-# flutter_wave
+# Wave
 
-A new Flutter project.
+Wave 是一款基于 **iroh** 的去中心化 P2P 即时通讯软件。消息、文件、语音全部点对点直连传输，不经过任何中心服务器——只有好友发现依赖可选的 Moon 发现服务。
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+跨平台支持 **Android** 与 **Windows**，同一账号可在两端同时使用（版本号互通、可互为更新）。
 
 ---
 
-## 已知问题（待测试修复）
+## 核心特性
 
-### Windows 语音通话「接收语音失败退出」（2026-09-02 记录，未修复）
+### 通讯
+- **文本消息**：发送中 → 已送达 → 已读，三级状态实时展示。
+- **图片消息**：发送/接收带压缩与缩略图，点击全屏预览。
+- **文件传输**：带进度的断点式分块传输。
+  - 接收方弹出**接受 / 拒绝**对话框，可选择保存位置，绝不静默落盘。
+  - 发送方可中途**取消**；取消后消息标记失败且不会自动重发。
+  - 接收完成后可直接**打开文件**或**打开所在文件夹**（Windows）。
+- **语音消息**：G.711 μ-law 编解码，接收时带未读红点，点按播放/暂停。
+- **语音通话**：P2P 实时通话，支持呼叫/接听/拒绝/忙线/挂断，通话界面带计时。
 
-- **现象**：Windows 端呼出/应答的语音通话在建立后约 100ms 内即退出，界面提示「接收语音失败」。对方（Rust CLI）能收到本机的语音，但本机「接收」路径失败。
-- **证据（`C:\Users\Administrator\wave_conn_log.txt` + `wave_audio.log`）**：
-  - 原生 WASAPI 插件 `wave_audio` 完全正常：mic 捕获持续出包（`capture: pkt #N`）、扬声器渲染持续写帧（`render: iter #N`），HRESULT 全部 OK。
-  - Dart 侧 `Media session started` → 立即 `Media: readMsg error` → `Call ended`，`play()` 为 0 次，即**从未收到任何 `CallAudio` 帧**。
-- **定位**：媒体会话的 `_readMsg(rx)`（`readExact(4)`）瞬间抛错，属已排队的本地流错误，非远端刚断。已从 Rust CLI（`G:\wave`，v0.3.0 工作树）源码确认：CLI 与 Flutter 共用同一条 bi-stream、相同 u32 LE 长度前缀分帧、且 CLI 用 ALSA（Windows 上采集会失败但不主动关流）。
-- **待办**：已部署带异常详情日志的构建（`app.so` 1:23:59）；需用户重新完整退出并启动 `G:\wave\wave_deploy\flutter_wave.exe` 复现一次，读取 `readExact` 的具体异常消息/堆栈，判定是 Wave 本地流状态问题还是 CLI 主动关流，再决定改 Dart 或同步改 Rust CLI。
+### 好友体系
+- **二维码加好友**：扫描对方二维码互换身份（一次成功则互为好友）。
+- **超声波加好友**：通过声音近距离交换身份（超出屏幕/光线受限场景）。
+- 好友**在线状态**实时探测（点对点 Presence 探测，仅互为好友才回复在线，陌生人一律离线），并随上线状态同步通知。
+- 通讯录管理：添加、删除、查看好友详情与状态。
+
+### 动态（Moments）
+- 发布文字 + 图片动态，图片按需拉取，好友动态实时推送与离线缓存。
+
+### 更新分发
+- 好友间直接互传**更新包**（`wave_*.zip`），自动比对平台与版本号，仅接受更新包中声明的版本。
+- 收到对方的更新包后先**校验平台/版本/路径安全**，再由用户确认执行解压与安装，重启后完成更新。
+
+### 邮箱保险箱（Email Vault）
+- 基于 IMAP 的邮件同步与加密归档（`enough_mail` + AES），支持 Webmail 全文搜索导入与恢复导出。
+
+### 其他
+- **消息持久化**：本地数据库（SQLite）保存历史消息/好友/文件索引，重启不丢失。
+- **通知与后台保活**：前台服务 + 本地通知，接听来电与文件传输在熄屏/后台也能工作（Android）。
+- **身份安全**：Ed25519 签名 + BLAKE3 哈希 + iroh 端到端加密通道，所有 P2P 报文均签名与加密。
+- 接收文件自动校验哈希，损坏自动重传。
 
 ---
 
-## 版本历史
+## 技术栈
 
-### 1.0.1+2（2026-09-01）
+| 层 | 技术 |
+|----|------|
+| 跨平台框架 | Flutter（Material 3） |
+| P2P 传输 | iroh（QUIC 打洞直连，Ed25519 身份、端到端加密） |
+| 状态管理 | flutter_riverpod |
+| 数据库 | SQLite（persistence_service） |
+| 语音通话/录音 | 自研 `wave_audio` 原生插件（WASAPI / AAudio）+ G.711 编解码 |
+| 超声波 | `ggwave_native` 插件（DPSK 音频编码） |
+| 邮箱 | enough_mail（IMAP） |
+| 加密 | cryptography（AES）、blake3_dart、flutter_secure_storage |
+| 通知 | flutter_local_notifications + flutter_foreground_task |
 
-- **新增** P2P 好友在线状态：不再依赖 Moon 服务器在线列表，改为通过点对点探测（`PresenceProbe`/`PresenceReply`）实时判断好友是否在线，仅已互为好友时回复"在线"，陌生人一律"离线"。
-- **新增** P2P 语音通话（呼出/来电/接听/拒接/挂断/忙线 + 通话中界面与计时）：通话信令与媒体均走同一条持久化 bi-stream，语音采用 G.711 μ-law（8kHz 单声道）编解码。
-- **新增** 通话入口：聊天界面上方新增拨打按钮；来电时自动弹出通话界面，可接听或拒接，响铃 30 秒无应答自动超时。
-- **协议扩展** `MessageBody` 新增变体：`CallInvite/CallAccept/CallReject/CallBusy/CallHangup/CallAudio/PresenceProbe/PresenceReply`（索引 13–20），与 Rust CLI v0.2.0 对齐。
-- **重构** 移除对 Moon `listOnlineUsers` 的在线状态依赖，`discover_screen` 仍保留 Moon 用于用户发现。
+---
 
-### 1.0.0+1（2026-08-31）
+## 构建
 
-- **新增** 聊天界面好友在线/离线状态显示（绿色圆点=在线，灰色=离线），打开聊天时自动刷新，应用运行期间每 15 秒自动同步一次。
-- **新增** 消息列表（Chats）中好友头像的在线状态圆点改为反映真实在线状态（替代原先的固定绿点）。
-- **修正** 文本消息状态：发送时显示"发送中"，对方确认接收（ACK）后显示"已送达"，对方离线或连接失败时显示"发送失败"（此前始终停留在"已发送"单勾状态）。
-- **修复** 相关逻辑：好友数据模型新增 `isOnline` 字段、好友在线状态按 Moon 服务器在线列表同步。
-- **优化** 减少对 Moon 服务器的频繁连接：在线状态轮询由每 15 秒延长至每 60 秒，并新增最小 30 秒间隔限流，避免打开聊天/定时器重复查询打满服务器。
-- **优化** 无需求时不连接 Moon 服务器：移除后台定时器，仅在用户打开「聊天列表」「通讯录」或进入聊天界面等真正需要显示在线状态的时刻，才按需查询一次（仍受 30 秒限流约束）。
+```bash
+# Windows（需 Visual Studio 17+ BuildTools，含 C++ 桌面工作负载）
+flutter build windows --release
 
+# Android（分 ABI 多包）
+flutter build apk --release --split-per-abi
+# 产物位于 build/app/outputs/flutter-apk/
+```
 
+> ⚠️ Windows 注意：`build/windows/x64/runner/Release` 若只生成 exe 而缺少运行库/数据，
+> 删除 `build/windows/x64/CMakeCache.txt` 后重新构建即可得到完整发布包。
+
+---
+
+## 发布
+
+每个版本在 GitHub Releases 发布 4 个安装包：
+
+- `wave-<版本>-windows.zip` — Windows 完整便携包
+- `wave-<版本>-arm64.apk` / `armv7.apk` / `x86_64.apk` — Android 分架构包
+
+## 目录结构
+
+```
+lib/
+  screens/     # 聊天、通讯录、动态、邮箱、设置等界面
+  services/    # iroh P2P、文件传输、通话、更新、邮箱等核心逻辑
+  models/      # 消息/好友/文件传输等数据模型
+  providers/   # Riverpod 状态管理
+  widgets/     # 气泡、波形等聊天组件
+plugins/       # 自研原生插件（wave_audio、ggwave_native）
+```
