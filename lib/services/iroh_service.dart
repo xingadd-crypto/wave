@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:iroh_flutter/iroh_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter_wave/models/message.dart';
 import 'package:flutter_wave/models/friend.dart';
 import 'package:flutter_wave/models/file_transfer.dart';
@@ -2181,6 +2182,7 @@ Future<void> _handleMomentImageData(
           MessageBody.callInvite(callId, _myNickname(), _myShortId()));
       await _writeFrame(tx, invite);
 
+      final ringStart = DateTime.now();
       while (_callPhase == CallPhase.outgoingRing) {
         if (_callLocalHangup) {
           await _trySendCallFrame(MessageBody.callHangup(callId));
@@ -2189,12 +2191,19 @@ Future<void> _handleMomentImageData(
           } catch (_) {}
           break;
         }
+        if (DateTime.now().difference(ringStart) >= _callRingTimeout) {
+          _endCallInternal('No answer');
+          return;
+        }
+        // Single-reader poll: never let a pending _readMsg linger on the
+        // stream when the accept arrives (see the callee loop note), or the
+        // media session's first _readMsg would race it for the frame header.
         Uint8List? frame;
         try {
-          frame = await Future.any([
-            _readMsg(rx),
-            _callHangupSignal.future.then((_) => null),
-          ]).timeout(_callRingTimeout);
+          frame = await _readMsg(rx)
+              .timeout(const Duration(milliseconds: 250));
+        } on TimeoutException {
+          continue;
         } catch (_) {
           frame = null;
         }
@@ -2203,6 +2212,7 @@ Future<void> _handleMomentImageData(
           _endCallInternal('No answer');
           return;
         }
+        if (frame.isEmpty) continue;
         try {
           final (_, body) = SignedMessage.verify(frame);
           if (body.kind == MessageBodyKind.callAccept) {
@@ -2412,43 +2422,48 @@ Future<void> _handleMomentImageData(
     if (answer == null) {
       // No completer wired; treat as missed / timed out.
     } else {
-      final ringAnswered = Object();
-      final ringDeclined = Object();
-      while (true) {
-        Object? result;
+      // Single-reader poll loop: only ONE _readMsg is ever active on the
+      // stream, and the answer/local-hangup state is checked between short
+      // reads. (A Future.any that abandons a pending _readMsg would leave a
+      // concurrent reader on the stream, so the media loop's next _readMsg
+      // would fight it for the first frame's length header -> instant
+      // "readMsg error" right after connecting.)
+      final ringStart = DateTime.now();
+      while (DateTime.now().difference(ringStart) < _callRingTimeout) {
+        if (answer.isCompleted) {
+          accept = await answer.future;
+          break;
+        }
+        if (_callLocalHangup) {
+          accept = false;
+          break;
+        }
+        Uint8List? ringFrame;
         try {
-          result = await Future.any<Object?>([
-            _readMsg(rx),
-            answer.future.then((v) => v ? ringAnswered : ringDeclined),
-          ]).timeout(_callRingTimeout);
+          ringFrame = await _readMsg(rx)
+              .timeout(const Duration(milliseconds: 250));
         } on TimeoutException {
-          accept = false;
-          break;
+          continue;
         } catch (_) {
+          break;
+        }
+        if (answer.isCompleted) {
+          accept = await answer.future;
+          break;
+        }
+        if (ringFrame == null) {
           // Stream closed / read error while ringing: peer gone.
-          accept = false;
           break;
         }
-        if (identical(result, ringAnswered)) {
-          accept = true;
-          break;
-        }
-        if (identical(result, ringDeclined)) {
-          accept = false;
-          break;
-        }
-        // A real frame arrived during the ring: only CallHangup is expected
-        // (the caller cancelling); anything else is silently ignored.
-        if (result is Uint8List) {
-          try {
-            final (_, body) = SignedMessage.verify(result);
-            if (body.kind == MessageBodyKind.callHangup) {
-              callerHungUp = true;
-              accept = false;
-              break;
-            }
-          } catch (_) {}
-        }
+        if (ringFrame.isEmpty) continue;
+        try {
+          final (_, body) = SignedMessage.verify(ringFrame);
+          if (body.kind == MessageBodyKind.callHangup) {
+            callerHungUp = true;
+            accept = false;
+            break;
+          }
+        } catch (_) {}
       }
     }
 
@@ -3385,10 +3400,36 @@ Future<void> _handleMomentImageData(
     _incomingMessageController.close();
   }
 
-  /// Capped in-memory rolling log.
+  /// Capped in-memory rolling log, also appended to `wave_call.log` on disk
+  /// (Windows: %USERPROFILE%; Android/iOS: app support dir) so call/file bugs
+  /// can be diagnosed after a reproduce.
   static const int _logCap = 4000;
   static final List<String> _logs = [];
   static List<String> get logs => _logs;
+  static File? _logFile;
+
+  static Future<File?> _resolveLogFile() async {
+    try {
+      if (Platform.isAndroid || Platform.isIOS) {
+        final dir = await getApplicationSupportDirectory();
+        return File('${dir.path}${Platform.pathSeparator}wave_call.log');
+      }
+      final home = Platform.environment['USERPROFILE'] ??
+          Platform.environment['HOME'] ??
+          Directory.systemTemp.path;
+      return File('$home${Platform.pathSeparator}wave_call.log');
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<void> _appendLogFile(String line) async {
+    try {
+      final f = _logFile ??= await _resolveLogFile();
+      if (f == null) return;
+      await f.writeAsString('$line\n', mode: FileMode.append);
+    } catch (_) {}
+  }
 
   void _log(String msg) {
     final line = '[${DateTime.now().toIso8601String()}] $msg';
@@ -3396,6 +3437,7 @@ Future<void> _handleMomentImageData(
     if (_logs.length > _logCap) {
       _logs.removeRange(0, _logs.length - _logCap);
     }
+    unawaited(_appendLogFile(line));
   }
 
   Future<void> _writeMsg(SendStream tx, Uint8List data) async {
