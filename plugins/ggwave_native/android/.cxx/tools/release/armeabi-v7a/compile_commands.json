@@ -1,0 +1,12 @@
+[
+{
+  "directory": "G:/wave/flutter_wave/plugins/ggwave_native/android/.cxx/RelWithDebInfo/3d5h46n4/armeabi-v7a",
+  "command": "C:\\Users\\Administrator\\android-sdk\\ndk\\28.2.13676358\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=armv7-none-linux-androideabi24 --sysroot=C:/Users/Administrator/android-sdk/ndk/28.2.13676358/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Dggwave_native_jni_EXPORTS -IG:/wave/flutter_wave/plugins/ggwave_native/android/src/main/cpp/../../../../native -IG:/wave/flutter_wave/plugins/ggwave_native/android/src/main/cpp/../../../../native/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security  -std=c++14 -O2 -g -DNDEBUG -fPIC -std=c++14 -o CMakeFiles\\ggwave_native_jni.dir\\ggwave_jni.cpp.o -c G:\\wave\\flutter_wave\\plugins\\ggwave_native\\android\\src\\main\\cpp\\ggwave_jni.cpp",
+  "file": "G:\\wave\\flutter_wave\\plugins\\ggwave_native\\android\\src\\main\\cpp\\ggwave_jni.cpp"
+},
+{
+  "directory": "G:/wave/flutter_wave/plugins/ggwave_native/android/.cxx/RelWithDebInfo/3d5h46n4/armeabi-v7a",
+  "command": "C:\\Users\\Administrator\\android-sdk\\ndk\\28.2.13676358\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=armv7-none-linux-androideabi24 --sysroot=C:/Users/Administrator/android-sdk/ndk/28.2.13676358/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Dggwave_native_jni_EXPORTS -IG:/wave/flutter_wave/plugins/ggwave_native/android/src/main/cpp/../../../../native -IG:/wave/flutter_wave/plugins/ggwave_native/android/src/main/cpp/../../../../native/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security  -std=c++14 -O2 -g -DNDEBUG -fPIC -std=c++14 -o CMakeFiles\\ggwave_native_jni.dir\\G_\\wave\\flutter_wave\\plugins\\ggwave_native\\native\\src\\ggwave.cpp.o -c G:\\wave\\flutter_wave\\plugins\\ggwave_native\\native\\src\\ggwave.cpp",
+  "file": "G:\\wave\\flutter_wave\\plugins\\ggwave_native\\native\\src\\ggwave.cpp"
+}
+]

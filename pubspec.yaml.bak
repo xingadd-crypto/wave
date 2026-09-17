@@ -1,0 +1,24 @@
+name: flutter_wave
+description: Wave - P2P Instant Messenger built with Flutter and iroh
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.5.0
+  path_provider: ^2.1.0
+  cupertino_icons: ^1.0.6
+  iroh_flutter: ^1.0.3
+  cryptography: ^2.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true

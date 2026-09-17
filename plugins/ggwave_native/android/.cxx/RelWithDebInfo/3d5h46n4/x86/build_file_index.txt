@@ -1,0 +1,1 @@
+G:\wave\flutter_wave\plugins\ggwave_native\android\src\main\cpp\CMakeLists.txt

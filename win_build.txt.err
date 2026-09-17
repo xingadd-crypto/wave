@@ -1,0 +1,8 @@
+Get-Item : 找不到项 C:\Users\Administrator\AppData。
+所在位置 G:\wave\flutter_wave\windows\flutter\ephemeral\.plugin_symlinks\iroh_flutter\cargokit\cmake\resolve_symlinks.p
+s1:25 字符: 17
++         $item = Get-Item $realPath
++                 ~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\Administrator\AppData:String) [Get-Item], IOException
+    + FullyQualifiedErrorId : ItemNotFound,Microsoft.PowerShell.Commands.GetItemCommand
+

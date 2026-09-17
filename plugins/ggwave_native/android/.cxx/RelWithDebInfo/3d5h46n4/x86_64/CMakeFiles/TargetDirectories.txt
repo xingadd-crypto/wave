@@ -1,0 +1,3 @@
+G:/wave/flutter_wave/plugins/ggwave_native/android/.cxx/RelWithDebInfo/3d5h46n4/x86_64/CMakeFiles/ggwave_native_jni.dir
+G:/wave/flutter_wave/plugins/ggwave_native/android/.cxx/RelWithDebInfo/3d5h46n4/x86_64/CMakeFiles/edit_cache.dir
+G:/wave/flutter_wave/plugins/ggwave_native/android/.cxx/RelWithDebInfo/3d5h46n4/x86_64/CMakeFiles/rebuild_cache.dir

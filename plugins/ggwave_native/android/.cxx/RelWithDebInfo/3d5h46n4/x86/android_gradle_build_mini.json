@@ -1,0 +1,27 @@
+{
+  "buildFiles": [
+    "G:\\wave\\flutter_wave\\plugins\\ggwave_native\\android\\src\\main\\cpp\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\Administrator\\android-sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "G:\\wave\\flutter_wave\\plugins\\ggwave_native\\android\\.cxx\\RelWithDebInfo\\3d5h46n4\\x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\Administrator\\android-sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "G:\\wave\\flutter_wave\\plugins\\ggwave_native\\android\\.cxx\\RelWithDebInfo\\3d5h46n4\\x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "ggwave_native_jni::@6890427a1f51a3e7e1df": {
+      "artifactName": "ggwave_native_jni",
+      "abi": "x86",
+      "output": "G:\\wave\\flutter_wave\\build\\ggwave_native\\intermediates\\cxx\\RelWithDebInfo\\3d5h46n4\\obj\\x86\\libggwave_native_jni.so",
+      "runtimeFiles": []
+    }
+  }
+}

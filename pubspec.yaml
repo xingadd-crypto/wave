@@ -1,0 +1,51 @@
+name: flutter_wave
+description: Wave - P2P Instant Messenger built with Flutter and iroh
+publish_to: 'none'
+version: 1.0.29
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.5.0
+  path_provider: ^2.1.0
+  cupertino_icons: ^1.0.6
+  iroh_flutter: ^1.0.3
+  cryptography: ^2.9.0
+  blake3_dart: ^1.0.0
+  file_picker: ^12.1.2
+  flutter_sound: ^9.30.0
+  permission_handler: ^11.3.0
+  archive: ^4.2.0
+  wave_audio:
+    path: plugins/wave_audio
+  ggwave_native:
+    path: plugins/ggwave_native
+  qr_flutter: 4.1.0
+  mobile_scanner: ^7.4.0
+  flutter_local_notifications: ^22.3.0
+  flutter_foreground_task: ^11.0.3
+  shared_preferences: ^2.5.5
+  image: ^4.9.2
+  enough_mail: ^2.1.7
+  flutter_secure_storage: ^11.1.0
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+dependency_overrides:
+  flutter_rust_bridge: 2.12.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/app_logo.png
+    - assets/wave_logo.png
+    - assets/fonts/materialicons_license.txt
+  fonts:
+    - family: MaterialIcons
+      fonts:
+        - asset: assets/fonts/materialicons-regular.otf

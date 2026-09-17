@@ -1,0 +1,6 @@
+# ninja log v5
+0	1663	8104760906782817	CMakeFiles/ggwave_native_jni.dir/ggwave_jni.cpp.o	992cc9bc34b91df9
+14	2110	8104760911471080	CMakeFiles/ggwave_native_jni.dir/G_/wave/flutter_wave/plugins/ggwave_native/native/src/ggwave.cpp.o	bcd2610d378ce175
+2110	2355	8104760913792506	G:/wave/flutter_wave/build/ggwave_native/intermediates/cxx/RelWithDebInfo/3d5h46n4/obj/arm64-v8a/libggwave_native_jni.so	6791177b71f7d6ac
+32	1130	8107313382792844	G:/wave/flutter_wave/build/ggwave_native/intermediates/cxx/RelWithDebInfo/3d5h46n4/obj/arm64-v8a/libggwave_native_jni.so	6791177b71f7d6ac
+113	2055	8110731359229321	G:/wave/flutter_wave/build/ggwave_native/intermediates/cxx/RelWithDebInfo/3d5h46n4/obj/arm64-v8a/libggwave_native_jni.so	6791177b71f7d6ac
